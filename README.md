@@ -332,13 +332,13 @@ See [TESTING.md](./TESTING.md) for comprehensive manual testing scenarios includ
 **Response:**
 ```json
 {
-  "user": {
-    "id": "user-123",
-    "name": "Owner User",
-    "email": "owner@acme.com",
-    "role": "Owner",
-    "organizationId": "org-1"
-  }
+    "user": {
+        "id": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d",
+        "name": "Owner User",
+        "email": "owner@acme.com",
+        "role": "Owner",
+        "organizationId": "8243aa20-936e-4c0f-821d-b71df4ecd132"
+    }
 }
 ```
 **Note:** JWT token is set in HttpOnly cookie (not in response body)
@@ -362,15 +362,15 @@ Returns the current authenticated user (for session restoration on app load).
 ```json
 [
   {
-    "id": "task-1",
-    "title": "Implement authentication",
-    "description": "Add JWT auth",
-    "category": "Work",
-    "status": "InProgress",
-    "order": 0,
-    "organizationId": "org-1",
-    "createdById": "user-1"
-  }
+        "id": "21989c63-49fd-4e0b-9055-cc59ec606783",
+        "title": "Update onboarding docs",
+        "description": "Refresh guidance for new hires.",
+        "category": "Work",
+        "status": "Done",
+        "order": 0,
+        "organizationId": "0ad1dc47-d563-4d77-be1d-ffa2a8af8cb6",
+        "createdById": "90c24699-5392-495b-9606-e36222bd76dd"
+    }
 ]
 ```
 
@@ -387,7 +387,21 @@ Returns the current authenticated user (for session restoration on app load).
   "order": 0
 }
 ```
-
+**Response:**
+```json
+[
+    {
+      "id": "0f5009db-679d-4871-9edd-ffed5d190b1a",
+      "title": "New Task",
+      "description": "Optional description",
+      "category": "Work",
+      "status": "Todo",
+      "order": 0,
+      "organizationId": "8243aa20-936e-4c0f-821d-b71df4ecd132",
+      "createdById": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d"
+  }
+]
+```
 #### PUT `/api/tasks/:id`
 **Permission:** `task:update` (Admin, Owner)
 
@@ -398,14 +412,113 @@ Returns the current authenticated user (for session restoration on app load).
   "status": "Done"
 }
 ```
+**Response:**
+```json
+[
+  {
+      "id": "0f5009db-679d-4871-9edd-ffed5d190b1a",
+      "title": "Updated Title",
+      "description": "Optional description",
+      "category": "Work",
+      "status": "Done",
+      "order": 0,
+      "organizationId": "8243aa20-936e-4c0f-821d-b71df4ecd132",
+      "createdById": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d"
+  }
+]
+```
 
 #### DELETE `/api/tasks/:id`
 **Permission:** `task:delete` (Admin, Owner)
-
+**Response:**
+```json
+[
+  {
+    "deleted": true
+}
+]
+```
 ### Audit Log
 
 #### GET `/api/audit-log`
 **Permission:** `audit:read` (Admin, Owner)
+**Response:**
+```json
+[
+    {
+        "userId": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d",
+        "action": "GET /api/audit-log",
+        "resource": "rbac",
+        "allowed": true,
+        "id": "baf3d037-5ef7-4a09-9fb8-3930ad4c172b",
+        "timestamp": "2026-02-09T18:08:50.318Z"
+    },
+    {
+        "userId": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d",
+        "action": "task:delete",
+        "resource": "task:undefined",
+        "allowed": true,
+        "id": "8060d56e-ae74-42bd-ac45-e600ec380df3",
+        "timestamp": "2026-02-09T18:07:52.281Z"
+    },
+    {
+        "userId": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d",
+        "action": "DELETE /api/tasks/0f5009db-679d-4871-9edd-ffed5d190b1a",
+        "resource": "rbac",
+        "allowed": true,
+        "id": "85439fef-b317-4079-8f33-8322693a50c5",
+        "timestamp": "2026-02-09T18:07:52.256Z"
+    },
+    {
+        "userId": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d",
+        "action": "task:update",
+        "resource": "task:0f5009db-679d-4871-9edd-ffed5d190b1a",
+        "allowed": true,
+        "id": "9b64fb95-91dd-4353-99b2-d779c2215a52",
+        "timestamp": "2026-02-09T18:01:03.448Z"
+    },
+    {
+        "userId": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d",
+        "action": "PUT /api/tasks/0f5009db-679d-4871-9edd-ffed5d190b1a",
+        "resource": "rbac",
+        "allowed": true,
+        "id": "6bd86bde-f64e-4e28-b014-b5d85a934f24",
+        "timestamp": "2026-02-09T18:01:03.361Z"
+    },
+    {
+        "userId": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d",
+        "action": "task:create",
+        "resource": "task:0f5009db-679d-4871-9edd-ffed5d190b1a",
+        "allowed": true,
+        "id": "ef18e595-3c6a-454a-b626-f4c0436959c0",
+        "timestamp": "2026-02-09T17:51:33.544Z"
+    },
+    {
+        "userId": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d",
+        "action": "POST /api/tasks",
+        "resource": "rbac",
+        "allowed": true,
+        "id": "d409beec-7bb1-428d-9c2c-5e0625c18a41",
+        "timestamp": "2026-02-09T17:51:33.478Z"
+    },
+    {
+        "userId": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d",
+        "action": "POST /api/tasks",
+        "resource": "rbac",
+        "allowed": true,
+        "id": "139ab273-d2c4-4f92-9636-2ec6162241c9",
+        "timestamp": "2026-02-09T17:50:19.628Z"
+    },
+    {
+        "userId": "ae3d867c-7053-4040-9a52-fd78f7f1cd3d",
+        "action": "GET /api/tasks",
+        "resource": "rbac",
+        "allowed": true,
+        "id": "1bb875f3-3ee8-495a-b29c-400437cc8c3f",
+        "timestamp": "2026-02-09T17:48:42.423Z"
+    }
+]
+```
 
 Returns audit log entries with access decisions and timestamps.
 
