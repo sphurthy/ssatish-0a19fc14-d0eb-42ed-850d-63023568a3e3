@@ -1,6 +1,6 @@
 # Secure Task Management System
 
-A production-ready Task Management System built with an Nx monorepo, NestJS backend, and Angular + TailwindCSS frontend. Features enterprise-grade security with cookie-based JWT authentication, comprehensive role-based access control (RBAC), organization hierarchy scoping, and real-time UI updates.
+A production-ready Task Management System built with an Nx monorepo, NestJS backend, and Angular + TailwindCSS frontend. Features enterprise-grade security with cookie-based JWT authentication, comprehensive role-based access control (RBAC), organization hierarchy scoping, and action-driven UI refreshes.
 
 ## 📋 Table of Contents
 - [Features](#features)
@@ -24,7 +24,7 @@ A production-ready Task Management System built with an Nx monorepo, NestJS back
 - **CSRF Protection Ready**: Architecture prepared for CSRF token implementation
 
 ### User Experience
-- **Real-Time Updates**: Automatic task polling (10s interval) for multi-user synchronization
+- **Action-Driven Updates**: Task list refreshes on create/update/delete and filter actions
 - **Toast Notifications**: Contextual feedback for all user actions (success, error, warning, info)
 - **Modal Dialogs**: Confirmation modals for destructive actions (delete)
 - **Drag-and-Drop Interface**: Intuitive task management with status column transitions
@@ -244,7 +244,7 @@ Concise UX features for the dashboard:
 - Reusable modals for edit and destructive confirmations.
 - Drag-and-drop task workflow with filters and search.
 - Permission-aware UI (view-only for Viewers).
-- Periodic task refresh (polling) for near real-time updates.
+- Task list refreshes on user actions (create/update/delete and filter changes).
 
 ## 🧪 Testing
 
@@ -534,15 +534,16 @@ Returns audit log entries with access decisions and timestamps.
 
 **Decision:** HttpOnly cookies for production-grade XSS protection. CSRF mitigation via `sameSite: strict` and future token implementation.
 
-### Why Polling Over WebSockets?
+### Why Action-Driven Refresh Over Polling?
 
 **Tradeoffs:**
 | Approach | Complexity | Scalability | Real-Time | Infrastructure |
 |----------|------------|-------------|-----------|----------------|
-| Polling (10s) | Low | Good | Near real-time | HTTP only |
+| Action-driven refresh | Low | Good | User-triggered | HTTP only |
+| Polling | Medium | Good | Near real-time | HTTP only |
 | WebSockets | High | Requires infrastructure | True real-time | WebSocket server |
 
-**Decision:** Polling for MVP simplicity. WebSocket/SSE recommended for production with high-frequency updates.
+**Decision:** Action-driven refresh for MVP simplicity and lower network usage. WebSocket/SSE recommended for true real-time updates.
 
 ### Why Role Inheritance?
 
