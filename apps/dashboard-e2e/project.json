@@ -7,5 +7,12 @@
     "dashboard"
   ],
   "// targets": "to see all targets run: nx show project dashboard-e2e --web",
-  "targets": {}
+  "targets": {
+    "e2e": {
+      "executor": "@nx/playwright:playwright",
+      "options": {
+        "config": "apps/dashboard-e2e/playwright.config.ts"
+      }
+    }
+  }
 }

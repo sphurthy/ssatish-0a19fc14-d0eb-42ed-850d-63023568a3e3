@@ -1,25 +1,35 @@
-<div class="min-h-screen bg-slate-50">
+<div class="min-h-screen bg-slate-50" data-testid="dashboard-page">
   <header class="bg-white shadow-sm">
     <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
       <div>
         <h1 class="text-xl font-semibold text-slate-900">Task Management Dashboard</h1>
         <p class="text-sm text-slate-500">Secure tasks with RBAC and org scoping.</p>
       </div>
-      <button class="text-sm text-slate-600 hover:text-slate-900" (click)="logout()">
+      <button
+        class="text-sm text-slate-600 hover:text-slate-900"
+        (click)="logout()"
+        data-testid="sign-out"
+      >
         Sign out
       </button>
     </div>
   </header>
 
   <main class="mx-auto max-w-6xl px-6 py-8 space-y-6">
-    <section class="bg-white rounded-lg shadow-sm p-6">
+    <section class="bg-white rounded-lg shadow-sm p-6" data-testid="task-form-section">
       <h2 class="text-lg font-semibold text-slate-900">Create / Edit Task</h2>
-      <form class="mt-4 grid gap-4 md:grid-cols-2" [formGroup]="taskForm" (ngSubmit)="submitTask()">
+      <form
+        class="mt-4 grid gap-4 md:grid-cols-2"
+        [formGroup]="taskForm"
+        (ngSubmit)="submitTask()"
+        data-testid="task-form"
+      >
         <div class="md:col-span-2">
           <label class="text-sm font-medium text-slate-700">Title</label>
           <input
             formControlName="title"
             class="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500"
+            data-testid="task-title"
           />
         </div>
         <div class="md:col-span-2">
@@ -28,6 +38,7 @@
             formControlName="description"
             rows="2"
             class="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500"
+            data-testid="task-description"
           ></textarea>
         </div>
         <div>
@@ -35,6 +46,7 @@
           <select
             formControlName="category"
             class="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+            data-testid="task-category"
           >
             <option *ngFor="let category of categories" [value]="category">
               {{ category }}
@@ -46,6 +58,7 @@
           <select
             formControlName="status"
             class="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+            data-testid="task-status"
           >
             <option *ngFor="let status of statuses" [value]="status">
               {{ status }}
@@ -56,6 +69,7 @@
           <button
             type="submit"
             class="rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-800"
+            data-testid="task-save"
           >
             Save Task
           </button>
@@ -63,6 +77,7 @@
             type="button"
             class="rounded-md border border-slate-200 px-4 py-2 text-slate-700"
             (click)="taskForm.reset({ id: '', title: '', description: '', category: categories[0], status: statuses[0], order: 0 })"
+            data-testid="task-clear"
           >
             Clear
           </button>
@@ -70,7 +85,7 @@
       </form>
     </section>
 
-    <section class="bg-white rounded-lg shadow-sm p-6">
+    <section class="bg-white rounded-lg shadow-sm p-6" data-testid="task-filters">
       <div class="flex flex-wrap items-end gap-4" [formGroup]="filtersForm">
         <div>
           <label class="text-sm font-medium text-slate-700">Search</label>
@@ -78,11 +93,16 @@
             formControlName="search"
             class="mt-1 w-64 rounded-md border border-slate-200 px-3 py-2"
             placeholder="Search tasks"
+            data-testid="filter-search"
           />
         </div>
         <div>
           <label class="text-sm font-medium text-slate-700">Category</label>
-          <select class="mt-1 w-40 rounded-md border border-slate-200 px-3 py-2" formControlName="category">
+          <select
+            class="mt-1 w-40 rounded-md border border-slate-200 px-3 py-2"
+            formControlName="category"
+            data-testid="filter-category"
+          >
             <option value="">All</option>
             <option *ngFor="let category of categories" [value]="category">
               {{ category }}
@@ -91,7 +111,11 @@
         </div>
         <div>
           <label class="text-sm font-medium text-slate-700">Status</label>
-          <select class="mt-1 w-40 rounded-md border border-slate-200 px-3 py-2" formControlName="status">
+          <select
+            class="mt-1 w-40 rounded-md border border-slate-200 px-3 py-2"
+            formControlName="status"
+            data-testid="filter-status"
+          >
             <option value="">All</option>
             <option *ngFor="let status of statuses" [value]="status">
               {{ status }}
@@ -100,7 +124,11 @@
         </div>
         <div>
           <label class="text-sm font-medium text-slate-700">Sort</label>
-          <select class="mt-1 w-40 rounded-md border border-slate-200 px-3 py-2" formControlName="sort">
+          <select
+            class="mt-1 w-40 rounded-md border border-slate-200 px-3 py-2"
+            formControlName="sort"
+            data-testid="filter-sort"
+          >
             <option *ngFor="let sort of sortOptions" [value]="sort">
               {{ sort }}
             </option>
@@ -110,12 +138,14 @@
           <button
             class="rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-800"
             (click)="applyFilters()"
+            data-testid="filter-apply"
           >
             Apply
           </button>
           <button
             class="rounded-md border border-slate-200 px-4 py-2 text-slate-700"
             (click)="clearFilters()"
+            data-testid="filter-clear"
           >
             Clear
           </button>
@@ -123,10 +153,11 @@
       </div>
     </section>
 
-    <section class="grid gap-4 md:grid-cols-3" cdkDropListGroup>
+    <section class="grid gap-4 md:grid-cols-3" cdkDropListGroup data-testid="task-columns">
       <div
         *ngFor="let status of statuses"
         class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+        [attr.data-testid]="'status-column-' + status"
       >
         <h3 class="text-sm font-semibold text-slate-700">{{ status }}</h3>
         <div
@@ -139,6 +170,8 @@
             *ngFor="let task of getTasksByStatus(status)"
             cdkDrag
             class="rounded-md border border-slate-200 bg-slate-50 p-3"
+            data-testid="task-card"
+            [attr.data-task-title]="task.title"
           >
             <div class="flex items-start justify-between">
               <div>
@@ -151,10 +184,18 @@
             </div>
             @if (authService.getUser()?.role !== 'Viewer') {
               <div class="mt-3 flex gap-2">
-                <button class="text-xs text-slate-600 hover:text-slate-900" (click)="editTask(task)">
+                <button
+                  class="text-xs text-slate-600 hover:text-slate-900"
+                  (click)="editTask(task)"
+                  data-testid="task-edit"
+                >
                   Edit
                 </button>
-                <button class="text-xs text-rose-600 hover:text-rose-800" (click)="deleteTask(task)">
+                <button
+                  class="text-xs text-rose-600 hover:text-rose-800"
+                  (click)="deleteTask(task)"
+                  data-testid="task-delete"
+                >
                   Delete
                 </button>
               </div>

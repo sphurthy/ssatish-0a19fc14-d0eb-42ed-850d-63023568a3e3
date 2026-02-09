@@ -22,6 +22,7 @@ import { ModalComponent } from '../modal/modal.component';
         <button
           (click)="cancel.emit()"
           class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors"
+          data-testid="confirm-cancel"
         >
           {{ cancelText }}
         </button>
@@ -29,6 +30,7 @@ import { ModalComponent } from '../modal/modal.component';
           (click)="confirm.emit()"
           [class]="getConfirmButtonClasses()"
           class="px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+          data-testid="confirm-accept"
         >
           {{ confirmText }}
         </button>

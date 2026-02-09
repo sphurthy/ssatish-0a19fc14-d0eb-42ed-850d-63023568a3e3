@@ -24,7 +24,7 @@ export default defineConfig({
   },
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npx nx run dashboard:serve',
+    command: 'npx nx run-many -t serve -p api dashboard',
     url: 'http://localhost:4200',
     reuseExistingServer: true,
     cwd: workspaceRoot,
