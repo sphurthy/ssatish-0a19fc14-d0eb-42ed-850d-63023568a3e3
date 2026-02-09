@@ -125,10 +125,8 @@ export class DashboardPageComponent implements OnInit {
   }
 
   editTask(task: Task) {
-    console.log('Edit task clicked:', task);
     this.taskToEdit = task;
     this.showEditModal = true;
-    console.log('showEditModal set to:', this.showEditModal);
     this.taskForm.patchValue({
       id: task.id,
       title: task.title,

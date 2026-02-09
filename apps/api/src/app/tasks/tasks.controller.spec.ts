@@ -1,4 +1,4 @@
-import { TaskCategory, TaskStatus, UserRole } from '@task-mgmt/data';
+import { TaskCategory, TaskStatus, UserRole } from '../../../../../libs/data/src';
 import { UserEntity } from '../users/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';

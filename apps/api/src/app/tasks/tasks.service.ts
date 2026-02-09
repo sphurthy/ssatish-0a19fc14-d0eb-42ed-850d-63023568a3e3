@@ -96,8 +96,9 @@ export class TasksService {
 
     const withinScope = orgIds.includes(task.organization.id);
     const allowedRole = user.role !== UserRole.Viewer;
+    const isOwner = task.createdBy.id === user.id;
 
-    if (!withinScope || !allowedRole) {
+    if (!withinScope || !allowedRole || !isOwner) {
       this.auditLogService.log({
         userId: user.id,
         action: Permission.TaskUpdate,
@@ -137,8 +138,9 @@ export class TasksService {
 
     const withinScope = orgIds.includes(task.organization.id);
     const allowedRole = user.role !== UserRole.Viewer;
+    const isOwner = task.createdBy.id === user.id;
 
-    if (!withinScope || !allowedRole) {
+    if (!withinScope || !allowedRole || !isOwner) {
       this.auditLogService.log({
         userId: user.id,
         action: Permission.TaskDelete,

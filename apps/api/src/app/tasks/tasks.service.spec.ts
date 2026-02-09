@@ -6,7 +6,7 @@ import {
   TaskCategory,
   TaskStatus,
   UserRole,
-} from '@task-mgmt/data';
+} from '../../../../../libs/data/src';
 import { Repository } from 'typeorm';
 import { AuditLogService } from '../audit/audit-log.service';
 import { OrganizationsService } from '../organizations/organizations.service';
@@ -286,6 +286,25 @@ describe('TasksService', () => {
       );
     });
 
+    it('should throw ForbiddenException when user is not the task owner', async () => {
+      organizationsService.getScopedOrganizationIds.mockResolvedValue(['org-1']);
+      tasksRepository.findOne.mockResolvedValue({
+        ...mockTask,
+        createdBy: { id: 'user-2' } as never,
+      });
+
+      await expect(
+        service.updateTask(mockUser, 'task-1', { title: 'Test' })
+      ).rejects.toThrow(ForbiddenException);
+
+      expect(auditLogService.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: Permission.TaskUpdate,
+          allowed: false,
+        })
+      );
+    });
+
     it('should throw ForbiddenException when user is Viewer', async () => {
       const viewerUser = { ...mockUser, role: UserRole.Viewer };
       organizationsService.getScopedOrganizationIds.mockResolvedValue(['org-1']);
@@ -359,6 +378,25 @@ describe('TasksService', () => {
 
       expect(auditLogService.log).toHaveBeenCalledWith(
         expect.objectContaining({
+          allowed: false,
+        })
+      );
+    });
+
+    it('should throw ForbiddenException when user is not the task owner', async () => {
+      organizationsService.getScopedOrganizationIds.mockResolvedValue(['org-1']);
+      tasksRepository.findOne.mockResolvedValue({
+        ...mockTask,
+        createdBy: { id: 'user-2' } as never,
+      });
+
+      await expect(service.deleteTask(mockUser, 'task-1')).rejects.toThrow(
+        ForbiddenException
+      );
+
+      expect(auditLogService.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: Permission.TaskDelete,
           allowed: false,
         })
       );

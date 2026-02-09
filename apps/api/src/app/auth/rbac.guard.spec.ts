@@ -1,7 +1,7 @@
 import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PERMISSIONS_KEY } from '@task-mgmt/auth';
-import { Permission, UserRole } from '@task-mgmt/data';
+import { Permission, UserRole } from '../../../../../libs/data/src';
+import { PERMISSIONS_KEY } from '../../../../../libs/auth/src';
 import { AuditLogService } from '../audit/audit-log.service';
 import { RbacGuard } from './rbac.guard';
 

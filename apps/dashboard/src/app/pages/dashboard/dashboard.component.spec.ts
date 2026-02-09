@@ -205,6 +205,27 @@ describe('DashboardPageComponent', () => {
       expect(mockToastService.success).toHaveBeenCalledWith('Task created successfully');
     });
 
+    it('should update task when form contains an id', () => {
+      fixture.detectChanges();
+      component.taskForm.patchValue({
+        id: 'task-1',
+        title: 'Updated Title',
+        description: 'Description',
+        category: TaskCategory.Work,
+        status: TaskStatus.InProgress,
+        order: 1,
+      });
+
+      component.submitTask();
+
+      expect(mockTasksStore.update).toHaveBeenCalledWith(
+        'task-1',
+        expect.objectContaining({ title: 'Updated Title' })
+      );
+      expect(mockTasksStore.create).not.toHaveBeenCalled();
+      expect(mockToastService.success).toHaveBeenCalledWith('Task updated successfully');
+    });
+
     it('should not submit task with invalid form', () => {
       fixture.detectChanges();
       component.taskForm.patchValue({
