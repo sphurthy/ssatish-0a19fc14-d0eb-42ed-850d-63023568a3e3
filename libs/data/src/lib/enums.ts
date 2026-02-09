@@ -10,6 +10,8 @@ export enum Permission {
   TaskUpdate = 'task:update',
   TaskDelete = 'task:delete',
   AuditRead = 'audit:read',
+  UserManage = 'user:manage',
+  OrganizationManage = 'organization:manage',
 }
 
 export enum TaskCategory {

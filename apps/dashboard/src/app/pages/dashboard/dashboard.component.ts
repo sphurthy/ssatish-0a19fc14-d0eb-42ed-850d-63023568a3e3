@@ -6,17 +6,21 @@ import { Task, TaskCategory, TaskStatus } from '@task-mgmt/data';
 import { AuthService } from '../../services/auth.service';
 import { TaskFilters } from '../../services/tasks.service';
 import { TasksStore } from '../../services/tasks.store';
+import { ToastService } from '../../services/toast.service';
+import { ModalComponent } from '../../components/modal/modal.component';
+import { ConfirmationModalComponent } from '../../components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DragDropModule],
+  imports: [CommonModule, ReactiveFormsModule, DragDropModule, ModalComponent, ConfirmationModalComponent],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly tasksStore = inject(TasksStore);
-  private readonly authService = inject(AuthService);
+  readonly authService = inject(AuthService);
+  private readonly toastService = inject(ToastService);
 
   readonly categories = Object.values(TaskCategory);
   readonly statuses = Object.values(TaskStatus);
@@ -45,6 +49,12 @@ export class DashboardPageComponent implements OnInit {
     [TaskStatus.Done]: [],
   };
   loading = false;
+
+  // Modal state
+  showEditModal = false;
+  showDeleteModal = false;
+  taskToEdit: Task | null = null;
+  taskToDelete: Task | null = null;
 
   ngOnInit() {
     this.tasksStore.tasks$.subscribe((tasks) => {
@@ -98,8 +108,10 @@ export class DashboardPageComponent implements OnInit {
 
     if (value.id) {
       this.tasksStore.update(value.id, payload);
+      this.toastService.success('Task updated successfully');
     } else {
       this.tasksStore.create(payload);
+      this.toastService.success('Task created successfully');
     }
 
     this.taskForm.reset({
@@ -113,6 +125,10 @@ export class DashboardPageComponent implements OnInit {
   }
 
   editTask(task: Task) {
+    console.log('Edit task clicked:', task);
+    this.taskToEdit = task;
+    this.showEditModal = true;
+    console.log('showEditModal set to:', this.showEditModal);
     this.taskForm.patchValue({
       id: task.id,
       title: task.title,
@@ -123,8 +139,60 @@ export class DashboardPageComponent implements OnInit {
     });
   }
 
+  confirmEdit() {
+    if (this.taskForm.invalid || !this.taskToEdit) {
+      return;
+    }
+
+    const value = this.taskForm.value;
+    const payload: Partial<Task> = {
+      title: value.title ?? '',
+      description: value.description ?? '',
+      category: (value.category as TaskCategory) ?? TaskCategory.Work,
+      status: (value.status as TaskStatus) ?? TaskStatus.Todo,
+      order: value.order ?? 0,
+    };
+
+    this.tasksStore.update(this.taskToEdit.id, payload);
+    this.toastService.success('Task updated successfully');
+    this.closeEditModal();
+  }
+
+  closeEditModal() {
+    this.showEditModal = false;
+    this.taskToEdit = null;
+    this.taskForm.reset({
+      id: '',
+      title: '',
+      description: '',
+      category: TaskCategory.Work,
+      status: TaskStatus.Todo,
+      order: 0,
+    });
+  }
+
   deleteTask(task: Task) {
-    this.tasksStore.remove(task.id);
+    this.taskToDelete = task;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete() {
+    if (!this.taskToDelete) {
+      return;
+    }
+
+    this.tasksStore.remove(this.taskToDelete.id);
+    this.toastService.success('Task deleted successfully');
+    this.closeDeleteModal();
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+    this.taskToDelete = null;
+  }
+
+  getDeleteMessage(): string {
+    return `Are you sure you want to delete "${this.taskToDelete?.title}"?`;
   }
 
   getTasksByStatus(status: TaskStatus) {

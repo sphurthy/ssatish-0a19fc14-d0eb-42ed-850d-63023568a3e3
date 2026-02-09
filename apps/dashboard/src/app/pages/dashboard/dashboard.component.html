@@ -149,17 +149,99 @@
                 {{ task.category }}
               </span>
             </div>
-            <div class="mt-3 flex gap-2">
-              <button class="text-xs text-slate-600 hover:text-slate-900" (click)="editTask(task)">
-                Edit
-              </button>
-              <button class="text-xs text-rose-600 hover:text-rose-800" (click)="deleteTask(task)">
-                Delete
-              </button>
-            </div>
+            @if (authService.getUser()?.role !== 'Viewer') {
+              <div class="mt-3 flex gap-2">
+                <button class="text-xs text-slate-600 hover:text-slate-900" (click)="editTask(task)">
+                  Edit
+                </button>
+                <button class="text-xs text-rose-600 hover:text-rose-800" (click)="deleteTask(task)">
+                  Delete
+                </button>
+              </div>
+            }
           </div>
         </div>
       </div>
     </section>
   </main>
 </div>
+
+<!-- Edit Modal -->
+@if (showEditModal && taskToEdit) {
+  <app-modal title="Edit Task" (close)="closeEditModal()">
+    <form [formGroup]="taskForm" (ngSubmit)="confirmEdit()">
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-medium text-slate-700">Title *</label>
+          <input
+            formControlName="title"
+            class="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500"
+          />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Description</label>
+          <textarea
+            formControlName="description"
+            rows="3"
+            class="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500"
+          ></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-medium text-slate-700">Category</label>
+            <select
+              formControlName="category"
+              class="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+            >
+              <option *ngFor="let category of categories" [value]="category">
+                {{ category }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-slate-700">Status</label>
+            <select
+              formControlName="status"
+              class="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+            >
+              <option *ngFor="let status of statuses" [value]="status">
+                {{ status }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div footer class="flex justify-end gap-3">
+        <button
+          type="button"
+          (click)="closeEditModal()"
+          class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="taskForm.invalid"
+          class="px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-md hover:bg-slate-800 disabled:bg-slate-400"
+        >
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </app-modal>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal && taskToDelete) {
+  <app-confirmation-modal
+    title="Delete Task"
+    [message]="'Are you sure you want to delete ' + taskToDelete.title + '?'"
+    [details]="'This action cannot be undone.'"
+    confirmText="Delete"
+    cancelText="Cancel"
+    confirmType="danger"
+    (confirm)="confirmDelete()"
+    (cancel)="closeDeleteModal()"
+  ></app-confirmation-modal>
+}

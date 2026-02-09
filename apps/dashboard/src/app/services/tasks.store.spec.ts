@@ -1,4 +1,3 @@
-import { describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
 import { TaskCategory, TaskStatus } from '@task-mgmt/data';
 import { TasksStore } from './tasks.store';
@@ -7,7 +6,7 @@ import { TasksService } from './tasks.service';
 describe('TasksStore', () => {
   it('loads tasks and updates the snapshot', () => {
     const tasksService = {
-      list: vi.fn().mockReturnValue(
+      list: jest.fn().mockReturnValue(
         of([
           {
             id: 'task-1',

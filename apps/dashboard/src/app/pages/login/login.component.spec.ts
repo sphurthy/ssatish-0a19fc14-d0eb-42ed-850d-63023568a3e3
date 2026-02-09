@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { describe, expect, it, vi } from 'vitest';
 import { AuthService } from '../../services/auth.service';
 import { LoginPageComponent } from './login.component';
 
@@ -10,7 +9,7 @@ describe('LoginPageComponent', () => {
       providers: [
         {
           provide: AuthService,
-          useValue: { login: vi.fn() },
+          useValue: { login: jest.fn() },
         },
       ],
     });

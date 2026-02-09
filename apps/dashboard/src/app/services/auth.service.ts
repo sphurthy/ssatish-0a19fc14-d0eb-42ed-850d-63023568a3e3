@@ -1,9 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, map, tap, catchError, of } from 'rxjs';
 
-const TOKEN_KEY = 'task-auth-token';
 const USER_KEY = 'task-auth-user';
 const API_BASE_URL = 'http://localhost:3000/api';
 
@@ -27,13 +26,13 @@ export class AuthService {
 
   login(email: string, password: string) {
     return this.http
-      .post<{ accessToken: string; user: AuthUser }>(`${API_BASE_URL}/auth/login`, {
-        email,
-        password,
-      })
+      .post<{ user: AuthUser }>(
+        `${API_BASE_URL}/auth/login`,
+        { email, password },
+        { withCredentials: true }
+      )
       .subscribe({
         next: (response) => {
-          localStorage.setItem(TOKEN_KEY, response.accessToken);
           localStorage.setItem(USER_KEY, JSON.stringify(response.user));
           this.userSubject.next(response.user);
           this.router.navigate(['/tasks']);
@@ -42,14 +41,32 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-    this.userSubject.next(null);
-    this.router.navigate(['/login']);
+    return this.http
+      .post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true })
+      .subscribe(() => {
+        localStorage.removeItem(USER_KEY);
+        this.userSubject.next(null);
+        this.router.navigate(['/login']);
+      });
   }
 
-  getToken() {
-    return localStorage.getItem(TOKEN_KEY);
+  checkAuth(): Observable<AuthUser | null> {
+    return this.http
+      .get<{ user: AuthUser }>(`${API_BASE_URL}/auth/me`, {
+        withCredentials: true,
+      })
+      .pipe(
+        map((response) => response.user),
+        tap((user) => {
+          localStorage.setItem(USER_KEY, JSON.stringify(user));
+          this.userSubject.next(user);
+        }),
+        catchError(() => {
+          localStorage.removeItem(USER_KEY);
+          this.userSubject.next(null);
+          return of(null);
+        })
+      );
   }
 
   getUser() {
@@ -57,7 +74,7 @@ export class AuthService {
   }
 
   isAuthenticated() {
-    return !!this.getToken();
+    return !!this.getUser();
   }
 
   private getStoredUser(): AuthUser | null {
