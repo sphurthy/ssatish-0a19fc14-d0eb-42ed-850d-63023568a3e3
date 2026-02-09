@@ -41,7 +41,11 @@ describe('OrganizationsService', () => {
   it('getScopedOrganizationIds should include org and children', async () => {
     organizationsRepository.findOne.mockResolvedValue({
       id: 'org-1',
-      children: [{ id: 'org-2' }, { id: 'org-3' }],
+      name: 'Org 1',
+      children: [
+        { id: 'org-2', name: 'Org 2' } as OrganizationEntity,
+        { id: 'org-3', name: 'Org 3' } as OrganizationEntity,
+      ],
     } as OrganizationEntity);
 
     const result = await service.getScopedOrganizationIds('org-1');
@@ -52,6 +56,7 @@ describe('OrganizationsService', () => {
   it('getScopedOrganizationIds should handle org with no children', async () => {
     organizationsRepository.findOne.mockResolvedValue({
       id: 'org-1',
+      name: 'Org 1',
       children: [],
     } as OrganizationEntity);
 

@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { ExecutionContext } from '@nestjs/common';
 import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
 import { CurrentUser } from './current-user.decorator';
@@ -12,10 +13,14 @@ describe('CurrentUser decorator', () => {
     } as never;
 
     class TestController {
-      test(@CurrentUser() _user: unknown) {}
+      test(_user: unknown) {}
     }
 
+    const decorator = CurrentUser();
+    decorator(TestController.prototype, 'test', 0);
+
     const args = Reflect.getMetadata(ROUTE_ARGS_METADATA, TestController, 'test');
+    expect(args).toBeTruthy();
     const paramMetadata = Object.values(args)[0] as { factory: Function; data: unknown };
     const result = paramMetadata.factory(paramMetadata.data, context);
 

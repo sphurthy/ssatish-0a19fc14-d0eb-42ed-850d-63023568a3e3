@@ -17,11 +17,19 @@ describe('AuthService', () => {
     const usersService = {
       findByEmail: jest.fn().mockResolvedValue(user),
     };
+    const organizationsService = {
+      findByName: jest.fn(),
+      save: jest.fn(),
+    };
     const jwtService = {
       signAsync: jest.fn().mockResolvedValue('token-123'),
     };
 
-    const authService = new AuthService(usersService as never, jwtService as never);
+    const authService = new AuthService(
+      usersService as never,
+      organizationsService as never,
+      jwtService as never
+    );
     const result = await authService.login('owner@acme.com', 'password123');
 
     expect(result.accessToken).toBe('token-123');
@@ -32,8 +40,16 @@ describe('AuthService', () => {
     const usersService = {
       findByEmail: jest.fn().mockResolvedValue(null),
     };
+    const organizationsService = {
+      findByName: jest.fn(),
+      save: jest.fn(),
+    };
     const jwtService = { signAsync: jest.fn() };
-    const authService = new AuthService(usersService as never, jwtService as never);
+    const authService = new AuthService(
+      usersService as never,
+      organizationsService as never,
+      jwtService as never
+    );
 
     await expect(authService.login('bad@acme.com', 'wrong')).rejects.toBeInstanceOf(
       UnauthorizedException

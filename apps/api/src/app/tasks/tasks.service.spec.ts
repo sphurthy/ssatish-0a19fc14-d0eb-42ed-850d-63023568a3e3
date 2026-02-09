@@ -286,23 +286,23 @@ describe('TasksService', () => {
       );
     });
 
-    it('should throw ForbiddenException when user is not the task owner', async () => {
+    it('should allow update when admin did not create the task', async () => {
       organizationsService.getScopedOrganizationIds.mockResolvedValue(['org-1']);
       tasksRepository.findOne.mockResolvedValue({
         ...mockTask,
         createdBy: { id: 'user-2' } as never,
       });
+      tasksRepository.save.mockResolvedValue({ ...mockTask, title: 'Test' });
 
-      await expect(
-        service.updateTask(mockUser, 'task-1', { title: 'Test' })
-      ).rejects.toThrow(ForbiddenException);
+      const result = await service.updateTask(mockUser, 'task-1', { title: 'Test' });
 
       expect(auditLogService.log).toHaveBeenCalledWith(
         expect.objectContaining({
           action: Permission.TaskUpdate,
-          allowed: false,
+          allowed: true,
         })
       );
+      expect(result.title).toBe('Test');
     });
 
     it('should throw ForbiddenException when user is Viewer', async () => {
@@ -383,23 +383,23 @@ describe('TasksService', () => {
       );
     });
 
-    it('should throw ForbiddenException when user is not the task owner', async () => {
+    it('should allow delete when admin did not create the task', async () => {
       organizationsService.getScopedOrganizationIds.mockResolvedValue(['org-1']);
       tasksRepository.findOne.mockResolvedValue({
         ...mockTask,
         createdBy: { id: 'user-2' } as never,
       });
+      tasksRepository.remove.mockResolvedValue(mockTask);
 
-      await expect(service.deleteTask(mockUser, 'task-1')).rejects.toThrow(
-        ForbiddenException
-      );
+      const result = await service.deleteTask(mockUser, 'task-1');
 
       expect(auditLogService.log).toHaveBeenCalledWith(
         expect.objectContaining({
           action: Permission.TaskDelete,
-          allowed: false,
+          allowed: true,
         })
       );
+      expect(result.deleted).toBe(true);
     });
 
     it('should throw ForbiddenException when user is Viewer', async () => {

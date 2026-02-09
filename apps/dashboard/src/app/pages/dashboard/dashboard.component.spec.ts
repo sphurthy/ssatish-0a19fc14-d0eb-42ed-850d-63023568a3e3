@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { Task, TaskCategory, TaskStatus, UserRole } from '@task-mgmt/data';
 import { DashboardPageComponent } from './dashboard.component';
 import { AuthService, AuthUser } from '../../services/auth.service';
@@ -48,7 +48,7 @@ describe('DashboardPageComponent', () => {
       load: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
-      remove: jest.fn(),
+      remove: jest.fn().mockReturnValue(of({ deleted: true })),
       setFilters: jest.fn(),
     } as never;
 

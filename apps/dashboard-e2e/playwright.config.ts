@@ -28,6 +28,9 @@ export default defineConfig({
     url: 'http://localhost:4200',
     reuseExistingServer: true,
     cwd: workspaceRoot,
+    env: {
+      DB_PATH: 'task-db-e2e',
+    },
   },
   projects: [
     {

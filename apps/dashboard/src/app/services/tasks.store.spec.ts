@@ -65,7 +65,7 @@ describe('TasksStore', () => {
 
   it('create adds optimistic task and filters by search', () => {
     tasksService.list.mockReturnValueOnce(of([]));
-    const create$ = new Subject();
+    const create$ = new Subject<Task>();
     tasksService.create.mockReturnValue(create$);
     store.setFilters({ search: 'alpha' });
     store.create({ title: 'Alpha task', category: TaskCategory.Work });
@@ -82,7 +82,7 @@ describe('TasksStore', () => {
 
   it('create sorts tasks by title when configured', () => {
     tasksService.list.mockReturnValueOnce(of([]));
-    tasksService.create.mockReturnValue(new Subject());
+    tasksService.create.mockReturnValue(new Subject<Task>());
     store.setFilters({ sort: 'title' });
     store.create({ title: 'Bravo', category: TaskCategory.Work });
     store.create({ title: 'Alpha', category: TaskCategory.Work });
@@ -93,7 +93,7 @@ describe('TasksStore', () => {
 
   it('filters by status and category for optimistic updates', () => {
     tasksService.list.mockReturnValueOnce(of([]));
-    tasksService.create.mockReturnValue(new Subject());
+    tasksService.create.mockReturnValue(new Subject<Task>());
     store.setFilters({ status: TaskStatus.Done, category: TaskCategory.Work });
     store.create({
       title: 'Done Task',
@@ -117,7 +117,7 @@ describe('TasksStore', () => {
 
   it('create uses default values when fields are missing', () => {
     tasksService.list.mockReturnValueOnce(of([]));
-    tasksService.create.mockReturnValue(new Subject());
+    tasksService.create.mockReturnValue(new Subject<Task>());
 
     store.create({});
 
@@ -131,7 +131,7 @@ describe('TasksStore', () => {
 
   it('sorts by order when configured', () => {
     tasksService.list.mockReturnValueOnce(of([]));
-    tasksService.create.mockReturnValue(new Subject());
+    tasksService.create.mockReturnValue(new Subject<Task>());
     store.setFilters({ sort: 'order' });
 
     store.create({ title: 'Task B', order: 2 });
@@ -157,7 +157,7 @@ describe('TasksStore', () => {
   });
 
   it('update triggers reload on completion', () => {
-    const update$ = new Subject();
+    const update$ = new Subject<Task>();
     tasksService.update.mockReturnValue(update$);
     tasksService.list.mockReturnValueOnce(of([]));
 
@@ -171,23 +171,23 @@ describe('TasksStore', () => {
   });
 
   it('remove deletes task from snapshot', () => {
-    tasksService.create.mockReturnValue(new Subject());
-    tasksService.remove.mockReturnValue(new Subject());
+    tasksService.create.mockReturnValue(new Subject<Task>());
+    tasksService.remove.mockReturnValue(new Subject<{ deleted: boolean }>());
     store.create({ title: 'Task to delete' });
     const taskId = store.getSnapshot()[0].id;
 
-    store.remove(taskId);
+    store.remove(taskId).subscribe();
 
     expect(store.getSnapshot().find((task) => task.id === taskId)).toBeUndefined();
   });
 
   it('remove triggers reload on completion', () => {
-    const remove$ = new Subject();
+    const remove$ = new Subject<{ deleted: boolean }>();
     tasksService.remove.mockReturnValue(remove$);
     tasksService.list.mockReturnValueOnce(of([]));
 
     const loadSpy = jest.spyOn(store, 'load');
-    store.remove(sampleTask.id);
+    store.remove(sampleTask.id).subscribe();
 
     remove$.complete();
 
