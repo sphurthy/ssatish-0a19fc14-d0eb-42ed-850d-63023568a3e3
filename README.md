@@ -14,6 +14,7 @@ A production-ready Task Management System built with an Nx monorepo, NestJS back
 - [Future Enhancements](#future-enhancements)
 - [Data Model](#data-model)
 
+<a id="features"></a>
 ## ✨ Features
 
 ### Security
@@ -38,6 +39,7 @@ A production-ready Task Management System built with an Nx monorepo, NestJS back
 - **Type Safety**: End-to-end TypeScript with shared interfaces
 - **Error Handling**: Global HTTP error interceptor with user-friendly messages
 
+<a id="monorepo-structure"></a>
 ## 🏗️ Monorepo Structure
 
 ```
@@ -65,6 +67,7 @@ libs/
   └── permissions.spec.ts   # Comprehensive permission tests
 ```
 
+<a id="setup-instructions"></a>
 ## 🚀 Setup Instructions
 
 ### Prerequisites
@@ -112,6 +115,7 @@ The dashboard runs on `http://localhost:4200`.
 | Admin  | admin@globex.com      | password123  | Globex (separate) |
 | Viewer | viewer@subsidiary.com | password123  | Subsidiary (child of ACME) |
 
+<a id="security-architecture"></a>
 ## 🔒 Security Architecture
 
 ### Cookie-Based Authentication (XSS Protection)
@@ -237,6 +241,7 @@ Audit logs capture:
 - ✅ Cross-organization access attempts
 - ✅ Viewer role attempting create/update/delete
 
+<a id="ux-features"></a>
 ## 🎨 UX Features
 
 Concise UX features for the dashboard:
@@ -246,6 +251,7 @@ Concise UX features for the dashboard:
 - Permission-aware UI (view-only for Viewers).
 - Task list refreshes on user actions (create/update/delete and filter changes).
 
+<a id="testing"></a>
 ## 🧪 Testing
 
 ### Backend Tests (Jest)
@@ -316,6 +322,7 @@ See [TESTING.md](./TESTING.md) for comprehensive manual testing scenarios includ
 - UX feature testing (modals, toasts, drag-drop)
 - Security validation (XSS protection, CSRF)
 
+<a id="api-documentation"></a>
 ## 📚 API Documentation
 
 ### Authentication
@@ -522,6 +529,7 @@ Returns the current authenticated user (for session restoration on app load).
 
 Returns audit log entries with access decisions and timestamps.
 
+<a id="architecture-decisions"></a>
 ## 🏛️ Architecture Decisions
 
 ### Why HttpOnly Cookies Over localStorage?
@@ -587,6 +595,7 @@ ROLE_HIERARCHY = {
 - Clear separation of concerns with libraries
 - Scalable to microservices architecture
 
+<a id="data-model"></a>
 ## 🧩 Data Model
 
 ### Schema Overview
@@ -606,6 +615,7 @@ erDiagram
   Task ||--o{ AuditLog : referencedBy
 ```
 
+<a id="future-enhancements"></a>
 ## 🚀 Future Enhancements
 
 ### Security
