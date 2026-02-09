@@ -12,6 +12,7 @@ A production-ready Task Management System built with an Nx monorepo, NestJS back
 - [API Documentation](#api-documentation)
 - [Architecture Decisions](#architecture-decisions)
 - [Future Enhancements](#future-enhancements)
+- [Data Model](#data-model)
 
 ## ✨ Features
 
@@ -238,98 +239,12 @@ Audit logs capture:
 
 ## 🎨 UX Features
 
-### Toast Notification System
-
-**Implementation:**
-```typescript
-// Service-based toast management
-this.toastService.success('Task created successfully');
-this.toastService.error('Permission denied');
-this.toastService.warning('Unsaved changes');
-this.toastService.info('Updates available');
-```
-
-**Features:**
-- Auto-dismiss after 5 seconds (configurable)
-- Color-coded by type (green, red, yellow, blue)
-- Stacked display for multiple toasts
-- Manual dismiss option
-- Slide-in animation
-
-### Modal Dialogs
-
-**Reusable Modal Component:**
-```html
-<app-modal [title]="'Edit Task'" (close)="closeModal()">
-  <!-- Modal content with ng-content projection -->
-  <form>...</form>
-
-  <!-- Footer buttons -->
-  <div footer>
-    <button (click)="cancel()">Cancel</button>
-    <button (click)="save()">Save</button>
-  </div>
-</app-modal>
-```
-
-**Features:**
-- Backdrop click to close
-- ESC key support
-- Animation (fade-in + scale)
-- Content projection (ng-content)
-- Optional footer slot
-
-### Confirmation Modal
-
-**Destructive Action Protection:**
-```typescript
-// Delete confirmation
-this.deleteTask(task);  // Opens modal
-// User confirms → task deleted + success toast
-// User cancels → modal closed, no action
-```
-
-**Features:**
-- Danger styling for destructive actions (red button)
-- Primary styling for non-destructive actions (blue button)
-- Customizable message and buttons
-- Optional details text
-
-### Real-Time Updates
-
-**Polling Strategy:**
-```typescript
-// Every 10 seconds, silently refresh tasks
-this.tasksStore.startPolling();
-
-// Stops when component destroyed
-ngOnDestroy() {
-  this.tasksStore.stopPolling();
-}
-```
-
-**Why Polling vs WebSockets:**
-- ✅ Simple implementation (no backend changes)
-- ✅ Sufficient for task management use case
-- ✅ Works with HTTP-only infrastructure
-- ⚠️ WebSocket/SSE recommended for high-frequency updates (see Future Enhancements)
-
-### Permission-Aware UI
-
-**Role-Based Rendering:**
-```html
-<!-- Hide create/edit/delete buttons for Viewers -->
-@if (authService.getUser()?.role !== 'Viewer') {
-  <button (click)="editTask(task)">Edit</button>
-  <button (click)="deleteTask(task)">Delete</button>
-}
-```
-
-**User Experience:**
-- Viewers see read-only interface (no confusing disabled buttons)
-- API calls are still protected (defense in depth)
-- Error interceptor shows permission denied toasts
-- Audit log captures attempted unauthorized actions
+Concise UX features for the dashboard:
+- Toast notifications for success/error/info feedback.
+- Reusable modals for edit and destructive confirmations.
+- Drag-and-drop task workflow with filters and search.
+- Permission-aware UI (view-only for Viewers).
+- Periodic task refresh (polling) for near real-time updates.
 
 ## 🧪 Testing
 
@@ -376,9 +291,14 @@ it('should allow Owner to access all Admin permissions', () => {
 });
 ```
 
-### Frontend Tests
+### Frontend Tests (Jest)
 
-**Test Templates Created:**
+**Run Tests:**
+```sh
+npx nx test dashboard
+```
+
+**Coverage Areas:**
 - ✅ dashboard.component.spec.ts (form validation, modals, filters)
 - ✅ auth.service.spec.ts (cookie auth, session restoration)
 - ✅ tasks.service.spec.ts (HTTP calls, error handling)
@@ -386,8 +306,6 @@ it('should allow Owner to access all Admin permissions', () => {
 - ✅ toast-container.component.spec.ts (rendering, dismissal)
 - ✅ toast.service.spec.ts (lifecycle, auto-dismiss)
 - ✅ confirmation-modal.component.spec.ts (danger styling, events)
-
-**Note:** Frontend tests require Vitest-specific async patterns (not Jest `done()` callbacks). Test templates are provided and need syntax updates for Vitest compatibility.
 
 ### Manual Testing Guide
 
@@ -555,11 +473,31 @@ ROLE_HIERARCHY = {
 - Clear separation of concerns with libraries
 - Scalable to microservices architecture
 
+## 🧩 Data Model
+
+### Schema Overview
+- **Organization**: tenant boundary with optional parent-child hierarchy.
+- **User**: belongs to an organization and has a role (Owner/Admin/Viewer).
+- **Task**: belongs to an organization and is created by a user.
+- **AuditLog**: captures access decisions and task operations.
+
+### ERD (conceptual)
+```mermaid
+erDiagram
+  Organization ||--o{ Organization : hasChildren
+  Organization ||--o{ User : hasUsers
+  Organization ||--o{ Task : hasTasks
+  User ||--o{ Task : creates
+  User ||--o{ AuditLog : generates
+  Task ||--o{ AuditLog : referencedBy
+```
+
 ## 🚀 Future Enhancements
 
 ### Security
 - [ ] **JWT Refresh Tokens**: Implement token rotation for long-lived sessions
 - [ ] **CSRF Token**: Add synchronizer token pattern for additional CSRF protection
+- [ ] **Advanced Role Delegation**: Time-bound or scoped permission grants
 - [ ] **Rate Limiting**: Prevent brute-force attacks on login endpoint
 - [ ] **Password Hashing**: Use Argon2 instead of bcrypt (more memory-hard)
 - [ ] **2FA/MFA**: Add two-factor authentication support
@@ -596,5 +534,3 @@ MIT
 This is an assessment project. For production use, please fork and adapt to your needs.
 
 ---
-
-**Built with ❤️ using Nx, NestJS, Angular, and TailwindCSS**
