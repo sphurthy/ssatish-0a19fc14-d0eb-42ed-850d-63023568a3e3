@@ -10,6 +10,10 @@ export class OrganizationsService {
     private readonly organizationsRepository: Repository<OrganizationEntity>
   ) {}
 
+  findByName(name: string) {
+    return this.organizationsRepository.findOne({ where: { name } });
+  }
+
   findById(id: string) {
     return this.organizationsRepository.findOne({
       where: { id },
@@ -26,7 +30,7 @@ export class OrganizationsService {
     return [org.id, ...childIds];
   }
 
-  save(org: OrganizationEntity) {
+  save(org: Partial<OrganizationEntity>) {
     return this.organizationsRepository.save(org);
   }
 }

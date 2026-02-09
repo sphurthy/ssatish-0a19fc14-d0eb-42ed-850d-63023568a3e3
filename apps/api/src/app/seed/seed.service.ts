@@ -24,16 +24,48 @@ export class SeedService implements OnModuleInit {
   async onModuleInit() {
     const existingUsers = await this.usersRepository.count();
     if (existingUsers > 0) {
+      await this.ensureGlobexAdmin();
       return;
     }
 
-    const [parentOrg, childOrg] = await this.seedOrganizations();
+    const [parentOrg, childOrg, globexOrg] = await this.seedOrganizations();
     await this.seedPermissions();
-    const [owner, admin, viewer, childViewer] = await this.seedUsers(
+    const [owner, admin, viewer, childViewer, globexAdmin] = await this.seedUsers(
       parentOrg,
-      childOrg
+      childOrg,
+      globexOrg
     );
-    await this.seedTasks(owner, admin, viewer, childViewer);
+    await this.seedTasks(owner, admin, viewer, childViewer, globexAdmin);
+  }
+
+  private async ensureGlobexAdmin() {
+    const existing = await this.usersRepository.findOne({
+      where: { email: 'admin@globex.com' },
+    });
+    if (existing) {
+      return;
+    }
+
+    let globexOrg = await this.organizationsRepository.findOne({
+      where: { name: 'Globex Corp' },
+    });
+
+    if (!globexOrg) {
+      globexOrg = this.organizationsRepository.create({
+        name: 'Globex Corp',
+      });
+      await this.organizationsRepository.save(globexOrg);
+    }
+
+    const passwordHash = await bcrypt.hash('password123', 10);
+    const globexAdmin = this.usersRepository.create({
+      name: 'Globex Admin',
+      email: 'admin@globex.com',
+      role: UserRole.Admin,
+      passwordHash,
+      organization: globexOrg,
+    });
+    await this.usersRepository.save(globexAdmin);
   }
 
   private async seedOrganizations() {
@@ -48,7 +80,12 @@ export class SeedService implements OnModuleInit {
     });
     await this.organizationsRepository.save(childOrg);
 
-    return [parentOrg, childOrg] as const;
+    const globexOrg = this.organizationsRepository.create({
+      name: 'Globex Corp',
+    });
+    await this.organizationsRepository.save(globexOrg);
+
+    return [parentOrg, childOrg, globexOrg] as const;
   }
 
   private async seedPermissions() {
@@ -63,7 +100,8 @@ export class SeedService implements OnModuleInit {
 
   private async seedUsers(
     parentOrg: OrganizationEntity,
-    childOrg: OrganizationEntity
+    childOrg: OrganizationEntity,
+    globexOrg: OrganizationEntity
   ) {
     const passwordHash = await bcrypt.hash('password123', 10);
 
@@ -99,15 +137,24 @@ export class SeedService implements OnModuleInit {
       organization: childOrg,
     });
 
-    await this.usersRepository.save([owner, admin, viewer, childViewer]);
-    return [owner, admin, viewer, childViewer] as const;
+    const globexAdmin = this.usersRepository.create({
+      name: 'Globex Admin',
+      email: 'admin@globex.com',
+      role: UserRole.Admin,
+      passwordHash,
+      organization: globexOrg,
+    });
+
+    await this.usersRepository.save([owner, admin, viewer, childViewer, globexAdmin]);
+    return [owner, admin, viewer, childViewer, globexAdmin] as const;
   }
 
   private async seedTasks(
     owner: UserEntity,
     admin: UserEntity,
     viewer: UserEntity,
-    childViewer: UserEntity
+    childViewer: UserEntity,
+    globexAdmin: UserEntity
   ) {
     const tasks = [
       this.tasksRepository.create({
@@ -145,6 +192,15 @@ export class SeedService implements OnModuleInit {
         order: 0,
         organization: childViewer.organization,
         createdBy: childViewer,
+      }),
+      this.tasksRepository.create({
+        title: 'Review vendor contracts',
+        description: 'Update renewal dates for Globex.',
+        category: TaskCategory.Work,
+        status: TaskStatus.Todo,
+        order: 0,
+        organization: globexAdmin.organization,
+        createdBy: globexAdmin,
       }),
     ];
 

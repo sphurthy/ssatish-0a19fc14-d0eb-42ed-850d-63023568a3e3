@@ -179,9 +179,16 @@ export class DashboardPageComponent implements OnInit {
       return;
     }
 
-    this.tasksStore.remove(this.taskToDelete.id);
-    this.toastService.success('Task deleted successfully');
-    this.closeDeleteModal();
+    const taskId = this.taskToDelete.id;
+    this.tasksStore.remove(taskId).subscribe({
+      next: () => {
+        this.toastService.success('Task deleted successfully');
+        this.closeDeleteModal();
+      },
+      error: () => {
+        this.closeDeleteModal();
+      },
+    });
   }
 
   closeDeleteModal() {

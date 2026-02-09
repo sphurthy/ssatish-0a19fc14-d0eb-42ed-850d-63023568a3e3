@@ -28,7 +28,7 @@ export class UsersService {
     return this.usersRepository.count();
   }
 
-  save(user: UserEntity) {
+  save(user: Partial<UserEntity>) {
     return this.usersRepository.save(user);
   }
 }

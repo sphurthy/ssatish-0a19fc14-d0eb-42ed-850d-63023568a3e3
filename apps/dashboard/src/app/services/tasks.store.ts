@@ -63,10 +63,7 @@ export class TasksStore {
     const updated = current.filter((task) => task.id !== taskId);
     this.tasksSubject.next(this.getSortedFilteredTasks(updated));
 
-    this.tasksService
-      .remove(taskId)
-      .pipe(finalize(() => this.load()))
-      .subscribe();
+    return this.tasksService.remove(taskId).pipe(finalize(() => this.load()));
   }
 
   getSnapshot() {
