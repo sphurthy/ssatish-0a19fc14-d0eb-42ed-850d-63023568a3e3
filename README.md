@@ -607,12 +607,37 @@ ROLE_HIERARCHY = {
 ### ERD (conceptual)
 ```mermaid
 erDiagram
-  Organization ||--o{ Organization : hasChildren
-  Organization ||--o{ User : hasUsers
-  Organization ||--o{ Task : hasTasks
+  Organization {
+    uuid id
+    string name
+    uuid parentId
+  }
+  User {
+    uuid id
+    string email
+    string role
+    uuid organizationId
+  }
+  Task {
+    uuid id
+    string title
+    string status
+    uuid organizationId
+    uuid createdById
+  }
+  AuditLog {
+    uuid id
+    string action
+    string resource
+    boolean allowed
+    uuid userId
+  }
+
+  Organization ||--o{ Organization : parent_child
+  Organization ||--o{ User : has_users
+  Organization ||--o{ Task : has_tasks
   User ||--o{ Task : creates
-  User ||--o{ AuditLog : generates
-  Task ||--o{ AuditLog : referencedBy
+  User ||--o{ AuditLog : writes
 ```
 
 <a id="future-enhancements"></a>
