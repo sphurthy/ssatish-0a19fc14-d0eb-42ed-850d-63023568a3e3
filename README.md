@@ -615,6 +615,7 @@ erDiagram
   User {
     uuid id
     string email
+    string password
     string role
     uuid organizationId
   }
