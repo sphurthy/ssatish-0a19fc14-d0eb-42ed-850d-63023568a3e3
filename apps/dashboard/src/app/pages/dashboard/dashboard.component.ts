@@ -9,11 +9,19 @@ import { TasksStore } from '../../services/tasks.store';
 import { ToastService } from '../../services/toast.service';
 import { ModalComponent } from '../../components/modal/modal.component';
 import { ConfirmationModalComponent } from '../../components/confirmation-modal/confirmation-modal.component';
+import { CreateTaskFormComponent } from './components/create-task-form.component';
 
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DragDropModule, ModalComponent, ConfirmationModalComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    DragDropModule,
+    ModalComponent,
+    ConfirmationModalComponent,
+    CreateTaskFormComponent,
+  ],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardPageComponent implements OnInit {
@@ -55,8 +63,11 @@ export class DashboardPageComponent implements OnInit {
   showDeleteModal = false;
   taskToEdit: Task | null = null;
   taskToDelete: Task | null = null;
+  isDarkMode = false;
 
   ngOnInit() {
+    this.isDarkMode = this.getStoredTheme() === 'dark';
+    this.applyThemeClass();
     this.tasksStore.tasks$.subscribe((tasks) => {
       this.tasks = tasks;
       this.groupedTasks = {
@@ -69,6 +80,12 @@ export class DashboardPageComponent implements OnInit {
     });
     this.tasksStore.loading$.subscribe((loading) => (this.loading = loading));
     this.tasksStore.load();
+  }
+
+  toggleTheme() {
+    this.isDarkMode = !this.isDarkMode;
+    this.applyThemeClass();
+    this.storeThemePreference(this.isDarkMode ? 'dark' : 'light');
   }
 
   applyFilters() {
@@ -227,5 +244,23 @@ export class DashboardPageComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+  }
+
+  private applyThemeClass() {
+    const root = document.documentElement;
+    if (this.isDarkMode) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }
+
+  private getStoredTheme(): 'light' | 'dark' | null {
+    const stored = localStorage.getItem('task-dashboard-theme');
+    return stored === 'dark' || stored === 'light' ? stored : null;
+  }
+
+  private storeThemePreference(theme: 'light' | 'dark') {
+    localStorage.setItem('task-dashboard-theme', theme);
   }
 }
