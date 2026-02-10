@@ -212,12 +212,11 @@ async updateTask(user, id, dto) {
 ```
 ACME (parent org)
 ├── Subsidiary A (child)
-└── Subsidiary B (child)
 
 Globex (separate org)
 
 Access Rules:
-- owner@acme.com can see: ACME, Subsidiary A, Subsidiary B tasks
+- owner@acme.com can see: ACME, Subsidiary A
 - viewer@subsidiary.com can see: Subsidiary A tasks only
 - admin@globex.com can see: Globex tasks only (no ACME access)
 ```
